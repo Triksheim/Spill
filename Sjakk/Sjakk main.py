@@ -2,7 +2,6 @@ import numpy as np
 import pygame
 import sys
 import math
-import time
 
 
 LIGHTBROWN = (255, 204, 153)
@@ -38,7 +37,7 @@ def draw_board(board):
         for r in range(0, ROW_COUNT, 2):
             pygame.draw.rect(screen, DARKBROWN, (c * SQUARESIZE, r * SQUARESIZE, SQUARESIZE, SQUARESIZE))
 
-def place_starting_pieces(board):  # Pawn 1, Rook 2, Knight 3, Bishop 4, Queen 5, King 6 ( White postive, Black negative)
+def place_starting_pieces(board):  # Pawn 1, Rook 2, Knight 3, Bishop 4, Queen 5, King 6 / black negative
     for c in range(COL_COUNT):
         board[1][c] = -1
         board[6][c] = 1
@@ -61,48 +60,48 @@ def place_starting_pieces(board):  # Pawn 1, Rook 2, Knight 3, Bishop 4, Queen 5
     board[7][4] = 6
 
 def move_piece(board, col, row, pick_drop,turn):
-    if turn == 0:
-        if pick_drop == 0:                              #Choose piece white
-            picked_piece = int(board[row][col])
+    if turn == 0: #White turn
+        if pick_drop == 0:
+            picked_piece = int(board[row][col]) #Pick piece
             if picked_piece >= 1:
                 board[row][col] = 0
                 pick_drop += 1
                 return picked_piece, col, row, pick_drop, turn
             elif pick_drop == 0:
-                print("Invalid pick")
+                print("Invalid white pick")
                 return picked_piece, col, row, pick_drop, turn
         else:
-            if board[row][col] <= 0:
-                board[row][col] = picked_piece_store
+            if board[row][col] <= 0 and not (row == row_store and col == col_store): #Check not same color or posision
+                board[row][col] = picked_piece_store #Place piece
                 pick_drop -= 1
                 print(board)
+                print("Placed white piece")
                 turn += 1
                 return pick_drop, turn
             else:
-                print("Invalid placement1")
-                print(board[row][col])
-                print(picked_piece_store)
+                print("Invalid white placement")
                 return pick_drop, turn
 
-    if turn == 1:
-        if pick_drop == 0:                               # Choose piece black
+    if turn == 1: # Black turn
+        if pick_drop == 0: # Choose piece
             picked_piece = int(board[row][col])
             if picked_piece <= -1:
                 board[row][col] = 0
                 pick_drop += 1
                 return picked_piece, col, row, pick_drop, turn
             elif pick_drop == 0:
-                print("Invalid pick")
+                print("Invalid black pick")
                 return picked_piece, col, row, pick_drop, turn
         else:
-            if board[row][col] >= 0:
+            if board[row][col] >= 0 and not (row == row_store and col == col_store): #Check not same color or posision
                 board[row][col] = picked_piece_store
                 pick_drop -= 1
                 print(board)
+                print("Placed black piece")
                 turn -= 1
                 return pick_drop, turn
             else:
-                print("Invalid placement2")
+                print("Invalid black placement")
                 return pick_drop, turn
 
 def draw_piece(board):
@@ -190,18 +189,14 @@ queen_b = pygame.transform.scale(queen_b,(int(SQUARESIZE),int(SQUARESIZE)))
 king_b = pygame.image.load("king_b.png")
 king_b = pygame.transform.scale(king_b,(int(SQUARESIZE),int(SQUARESIZE)))
 
+
 board = create_board()
 place_starting_pieces(board)
-
-
 draw_board(board)
 draw_piece(board)
 print(board)
+print("Starting pieces placed")
 pygame.display.update()
-
-
-
-
 
 
 # Main loop
@@ -215,19 +210,14 @@ while not game_over:
         elif event.type == pygame.MOUSEBUTTONDOWN:
             posx = event.pos[0]
             posy = event.pos[1]
-            col = int(math.floor(posx/SQUARESIZE))
+            col = int(math.floor(posx / SQUARESIZE))
             row = int(math.floor(posy / SQUARESIZE))
-
-            print(pick_drop)
             if pick_drop == 0: # Pick = 0, Drop = 1
                 picked_piece_store, col_store, row_store, pick_drop, turn = move_piece(board, col, row, pick_drop,turn)
             else:
                 pick_drop, turn = move_piece(board, col, row, pick_drop,turn)
 
-
-
         elif pick_drop == 1:  # Drag piece
-            board[row][col] = 0
             # White
             if picked_piece_store == 1 and turn == 0:
                 mouse_x, mouse_y = pygame.mouse.get_pos()
