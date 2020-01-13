@@ -1,4 +1,4 @@
-import numpy as np
+import numpy
 import pygame
 import sys
 import math
@@ -16,7 +16,7 @@ SQUARESIZE = 100
 # Functions ----------------------------------------------------------------------------------------------------------
 
 def create_board():
-    board = np.zeros((ROW_COUNT, COL_COUNT))
+    board = numpy.zeros((ROW_COUNT, COL_COUNT))
     return board
 
 def draw_board(board):
