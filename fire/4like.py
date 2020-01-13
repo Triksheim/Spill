@@ -108,52 +108,52 @@ while not game_over:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
-    mouse = pygame.mouse.get_pos()
-    mouse_x = mouse[0]
-    #print(mouse_x)
-    if turn == 0:
-        pygame.draw.circle(screen, RED, (int(mouse_x), int(SQUARESIZE / 2)), RADIUS)
-    elif turn == 1:
-        pygame.draw.circle(screen, YELLOW, (int(mouse_x), int(SQUARESIZE / 2)), RADIUS)
+        mouse = pygame.mouse.get_pos()
+        mouse_x = mouse[0]
+        #print(mouse_x)
+        if turn == 0:
+            pygame.draw.circle(screen, RED, (int(mouse_x), int(SQUARESIZE / 2)), RADIUS)
+        elif turn == 1:
+            pygame.draw.circle(screen, YELLOW, (int(mouse_x), int(SQUARESIZE / 2)), RADIUS)
 
 
 
 
-    pygame.display.update()
-    draw_board(board)
-    pygame.draw.circle(screen, BLACK, (int(mouse_x), int(SQUARESIZE / 2)), RADIUS)
-
-    if event.type == pygame.MOUSEBUTTONDOWN and turn == 0:
-        posx = event.pos[0]
-        col = int(math.floor(posx/SQUARESIZE))
-        time.sleep(0.2)
-        drop_piece(board, col, turn)
-        if valid:
-            turn += 1
-        else:
-            valid = True
-
-        if check_win(board, 1):
-            print("Player 1 won!")
-            game_over = True
+        pygame.display.update()
         draw_board(board)
+        pygame.draw.circle(screen, BLACK, (int(mouse_x), int(SQUARESIZE / 2)), RADIUS)
 
-    elif event.type == pygame.MOUSEBUTTONDOWN and turn == 1 and not game_over:
-        posx = event.pos[0]
-        pygame.event.clear()
-        col = int(math.floor(posx / SQUARESIZE))
-        time.sleep(0.2)
-        drop_piece(board, col, turn)
-        check_win(board, 2)
-        if valid:
-            turn -= 1
-        else:
-            valid = True
+        if event.type == pygame.MOUSEBUTTONDOWN and turn == 0:
+            posx = event.pos[0]
+            col = int(math.floor(posx/SQUARESIZE))
+            time.sleep(0.2)
+            drop_piece(board, col, turn)
+            if valid:
+                turn += 1
+            else:
+                valid = True
 
-        if check_win(board, 2):
-            print("Player 2 won!")
-            game_over = True
-        draw_board(board)
+            if check_win(board, 1):
+                print("Player 1 won!")
+                game_over = True
+            draw_board(board)
+
+        elif event.type == pygame.MOUSEBUTTONDOWN and turn == 1 and not game_over:
+            posx = event.pos[0]
+            pygame.event.clear()
+            col = int(math.floor(posx / SQUARESIZE))
+            time.sleep(0.2)
+            drop_piece(board, col, turn)
+            check_win(board, 2)
+            if valid:
+                turn -= 1
+            else:
+                valid = True
+
+            if check_win(board, 2):
+                print("Player 2 won!")
+                game_over = True
+            draw_board(board)
 
 while game_over:
     for event in pygame.event.get():
