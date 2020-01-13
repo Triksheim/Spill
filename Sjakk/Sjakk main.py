@@ -6,7 +6,7 @@ import time
 
 
 LIGHTBROWN = (255, 204, 153)
-DARKBROWN = (51, 25, 0)
+DARKBROWN = (80, 25, 0)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 ROW_COUNT = 8
@@ -60,14 +60,50 @@ def place_starting_pieces(board):  # Pawn 1, Rook 2, Knight 3, Bishop 4, Queen 5
     board[7][3] = 5
     board[7][4] = 6
 
-def move_piece(board, col, row, pick_drop):
-    if pick_drop == 0:
-        picked_piece = int(board[row][col])
-        return picked_piece, col, row
-    elif pick_drop == 1:
-        board[row][col] = picked_piece_store
-        board[row_store][col_store] = 0
-        print(board)
+def move_piece(board, col, row, pick_drop,turn):
+    if turn == 0:
+        if pick_drop == 0:                              #Choose piece white
+            picked_piece = int(board[row][col])
+            if picked_piece >= 1:
+                board[row][col] = 0
+                pick_drop += 1
+                return picked_piece, col, row, pick_drop, turn
+            elif pick_drop == 0:
+                print("Invalid pick")
+                return picked_piece, col, row, pick_drop, turn
+        else:
+            if board[row][col] <= 0:
+                board[row][col] = picked_piece_store
+                pick_drop -= 1
+                print(board)
+                turn += 1
+                return pick_drop, turn
+            else:
+                print("Invalid placement1")
+                print(board[row][col])
+                print(picked_piece_store)
+                return pick_drop, turn
+
+    if turn == 1:
+        if pick_drop == 0:                               # Choose piece black
+            picked_piece = int(board[row][col])
+            if picked_piece <= -1:
+                board[row][col] = 0
+                pick_drop += 1
+                return picked_piece, col, row, pick_drop, turn
+            elif pick_drop == 0:
+                print("Invalid pick")
+                return picked_piece, col, row, pick_drop, turn
+        else:
+            if board[row][col] >= 0:
+                board[row][col] = picked_piece_store
+                pick_drop -= 1
+                print(board)
+                turn -= 1
+                return pick_drop, turn
+            else:
+                print("Invalid placement2")
+                return pick_drop, turn
 
 def draw_piece(board):
     for c in range(COL_COUNT):
@@ -176,19 +212,110 @@ while not game_over:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 pygame.quit()
-        elif event.type == pygame.MOUSEBUTTONDOWN and turn == 0:
+        elif event.type == pygame.MOUSEBUTTONDOWN:
             posx = event.pos[0]
             posy = event.pos[1]
             col = int(math.floor(posx/SQUARESIZE))
             row = int(math.floor(posy / SQUARESIZE))
+
             print(pick_drop)
             if pick_drop == 0: # Pick = 0, Drop = 1
-                picked_piece_store, col_store, row_store = move_piece(board, col, row, pick_drop)
-                pick_drop += 1
-            elif pick_drop == 1:
-                move_piece(board,col,row,pick_drop)
-                pick_drop -= 1
+                picked_piece_store, col_store, row_store, pick_drop, turn = move_piece(board, col, row, pick_drop,turn)
+            else:
+                pick_drop, turn = move_piece(board, col, row, pick_drop,turn)
 
+
+
+        elif pick_drop == 1:  # Drag piece
+            board[row][col] = 0
+            # White
+            if picked_piece_store == 1 and turn == 0:
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                pawn_drag = int(mouse_x-50), int(mouse_y-50)
+                draw_piece(board)
+                screen.blit(pawn, pawn_drag)
+                pygame.display.update()
+                draw_board(board)
+            elif picked_piece_store == 2 and turn == 0:
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                rook_drag = int(mouse_x-50), int(mouse_y-50)
+                draw_piece(board)
+                screen.blit(rook, rook_drag)
+                pygame.display.update()
+                draw_board(board)
+            elif picked_piece_store == 3 and turn == 0:
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                knight_drag = int(mouse_x-50), int(mouse_y-50)
+                draw_piece(board)
+                screen.blit(knight, knight_drag)
+                pygame.display.update()
+                draw_board(board)
+            elif picked_piece_store == 4 and turn == 0:
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                bishop_drag = int(mouse_x-50), int(mouse_y-50)
+                draw_piece(board)
+                screen.blit(bishop, bishop_drag)
+                pygame.display.update()
+                draw_board(board)
+            elif picked_piece_store == 5 and turn == 0:
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                queen_drag = int(mouse_x-50), int(mouse_y-50)
+                draw_piece(board)
+                screen.blit(queen, queen_drag)
+                pygame.display.update()
+                draw_board(board)
+            elif picked_piece_store == 6 and turn == 0:
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                king_drag = int(mouse_x-50), int(mouse_y-50)
+                draw_piece(board)
+                screen.blit(king, king_drag)
+                pygame.display.update()
+                draw_board(board)
+            # Black
+            elif picked_piece_store == -1 and turn == 1:
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                pawn_b_drag = int(mouse_x-50), int(mouse_y-50)
+                draw_piece(board)
+                screen.blit(pawn_b, pawn_b_drag)
+                pygame.display.update()
+                draw_board(board)
+            elif picked_piece_store == -2 and turn == 1:
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                rook_b_drag = int(mouse_x-50), int(mouse_y-50)
+                draw_piece(board)
+                screen.blit(rook_b, rook_b_drag)
+                pygame.display.update()
+                draw_board(board)
+            elif picked_piece_store == -3 and turn == 1:
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                knight_b_drag = int(mouse_x-50), int(mouse_y-50)
+                draw_piece(board)
+                screen.blit(knight_b, knight_b_drag)
+                pygame.display.update()
+                draw_board(board)
+            elif picked_piece_store == -4 and turn == 1:
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                bishop_b_drag = int(mouse_x-50), int(mouse_y-50)
+                draw_piece(board)
+                screen.blit(bishop_b, bishop_b_drag)
+                pygame.display.update()
+                draw_board(board)
+            elif picked_piece_store == -5 and turn == 1:
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                queen_b_drag = int(mouse_x-50), int(mouse_y-50)
+                draw_piece(board)
+                screen.blit(queen_b, queen_b_drag)
+                pygame.display.update()
+                draw_board(board)
+            elif picked_piece_store == -6 and turn == 1:
+                mouse_x, mouse_y = pygame.mouse.get_pos()
+                king_b_drag = int(mouse_x-50), int(mouse_y-50)
+                draw_piece(board)
+                screen.blit(king_b, king_b_drag)
+                pygame.display.update()
+                draw_board(board)
+        else:
             draw_piece(board)
             pygame.display.update()
             draw_board(board)
+
