@@ -75,12 +75,18 @@ def move_piece(board, col, row, pick_or_place, turn):
         else:
             # Checks if picked place is a new position and no piece of same color on square
             if board[row][col] <= 0 and not (row == row_store and col == col_store):
-                board[row][col] = picked_piece_store    # Placing the piece in board data
-                pick_or_place -= 1
-                print(board)
-                print("Placed white piece")
-                turn += 1                               # Switches turn
-                return pick_or_place, turn
+                if validate_piece_placement(board,picked_piece_store, row_store, col_store, row, col):
+                    board[row][col] = picked_piece_store    # Placing the piece in board data
+                    pick_or_place -= 1
+                    print(board)
+                    print("Placed white piece")
+                    turn += 1                               # Switches turn
+                    return pick_or_place, turn
+                else:
+                    board[row_store][col_store] = picked_piece_store
+                    pick_or_place -= 1
+                    print("Validate failed")
+                    return pick_or_place, turn
             else:
                 board[row_store][col_store] = picked_piece_store
                 pick_or_place -= 1
@@ -100,18 +106,152 @@ def move_piece(board, col, row, pick_or_place, turn):
                 return picked_piece, col, row, pick_or_place, turn
         else:
             if board[row][col] >= 0 and not (row == row_store and col == col_store):
-                board[row][col] = picked_piece_store
-                pick_or_place -= 1
-                print(board)
-                print("Placed black piece")
-                turn -= 1
-                return pick_or_place, turn
-            else:
-                board[row_store][col_store] = picked_piece_store
-                pick_or_place -= 1
-                print("Invalid black placement")
-                return pick_or_place, turn
+                if validate_piece_placement(board, picked_piece_store, row_store, col_store, row, col):
+                    board[row][col] = picked_piece_store
+                    pick_or_place -= 1
+                    print(board)
+                    print("Placed black piece")
+                    turn -= 1
+                    return pick_or_place, turn
+                else:
+                    board[row_store][col_store] = picked_piece_store
+                    pick_or_place -= 1
+                    print("Invalid black placement")
+                    return pick_or_place, turn
 
+def validate_piece_placement(board,picked_piece, picked_row, picked_col, place_row, place_col):
+    print(picked_piece)
+    # Validate pawn move
+    if picked_piece == 1:
+        if picked_row == place_row + 1 and picked_col == place_col:
+            return True
+        elif picked_row == 6 and  picked_row == place_row + 2 and picked_col == place_col:
+            return True
+        elif picked_row == place_row + 1 and board[place_row][place_col] < 0:
+            return True
+        else:
+            return False
+    elif picked_piece == -1:
+        if picked_row == place_row - 1 and picked_col == place_col:
+            return True
+        elif picked_row == 1 and picked_row == place_row - 2 and picked_col == place_col:
+            return True
+        elif picked_row == place_row - 1 and board[place_row][place_col] > 0:
+            return True
+        else:
+            return False
+
+    #Validate knight move
+    elif picked_piece == 3 or -3:
+        if picked_row == place_row + 2 and (picked_col == place_col + 1 or picked_col == place_col - 1):
+            return True
+        elif picked_row == place_row + 1 and (picked_col == place_col + 2 or picked_col == place_col - 2):
+            return True
+        elif picked_row == place_row - 2 and (picked_col == place_col + 1 or picked_col == place_col - 1):
+            return True
+        elif picked_row == place_row - 1 and (picked_col == place_col + 2 or picked_col == place_col - 2):
+            return True
+        else:
+            return False
+
+    # Validate rook move
+    elif picked_piece == 2 or -2:
+        print("rook")
+        if picked_col == place_col:
+            for r in range(abs(picked_row - place_row)):
+                if picked_row > place_row:
+                    if board[picked_row - r][picked_col] != 0:
+                        return False
+                elif picked_row < place_row:
+                    if board[picked_row + r][picked_col] != 0:
+                        return False
+            return True
+        elif picked_row == place_row:
+            for r in range(abs(picked_col - place_col)):
+                if picked_col > place_col:
+                    if board[picked_row][picked_col - r] != 0:
+                        return False
+                elif picked_col < place_col:
+                    if board[picked_row][picked_col + r] != 0:
+                        return False
+            return True
+    # Validate bishop move
+    elif picked_piece == 4 or -4:
+        print("bishop1")
+        if picked_col != place_col and picked_row != place_row and (abs(picked_row - place_row) - abs(picked_col - place_col)) == 0:
+            check = (place_row + place_col) % 2
+            print(check)
+            for r in range(abs(picked_row - place_row)):
+                if picked_row > place_row and picked_col > place_col:
+                    if board[picked_row - r][picked_col - r] != 0:
+                        return False
+                elif picked_row > place_row and picked_col < place_col:
+                    if board[picked_row - r][picked_col + r] != 0:
+                        return False
+                elif picked_row < place_row and picked_col > place_col:
+                    if board[picked_row + r][picked_col - r] != 0:
+                        return False
+                elif picked_row < place_row and picked_col < place_col:
+                    if board[picked_row + r][picked_col + r] != 0:
+                        return False
+            return True
+        else:
+            return False
+    # Validate queen move
+    elif picked_piece == 5 or -5:
+        if picked_col == place_col:
+            for r in range(abs(picked_row - place_row)):
+                if picked_row > place_row:
+                    if board[picked_row - r][picked_col] != 0:
+                        return False
+                elif picked_row < place_row:
+                    if board[picked_row + r][picked_col] != 0:
+                        return False
+            return True
+        elif picked_row == place_row:
+            for r in range(abs(picked_col - place_col)):
+                if picked_col > place_col:
+
+                    if board[picked_row][picked_col - r] != 0:
+                        return False
+                elif picked_col < place_col:
+                    if board[picked_row][picked_col + r] != 0:
+                        return False
+            return True
+        elif picked_col != place_col and picked_row != place_row and (abs(picked_row - place_row) - abs(picked_col - place_col)) == 0:
+            check = (place_row + place_col) % 2
+            print(check)
+            for r in range(abs(picked_row - place_row)):
+                if picked_row > place_row and picked_col > place_col:
+                    if board[picked_row - r][picked_col - r] != 0:
+                        return False
+                elif picked_row > place_row and picked_col < place_col:
+                    if board[picked_row - r][picked_col + r] != 0:
+                        return False
+                elif picked_row < place_row and picked_col > place_col:
+                    if board[picked_row + r][picked_col - r] != 0:
+                        return False
+                elif picked_row < place_row and picked_col < place_col:
+                    if board[picked_row + r][picked_col + r] != 0:
+                        return False
+            return True
+        else:
+            return False
+
+    # Validate king move
+    elif picked_piece == 6 or -6:
+        if (picked_row == place_row + 1 and picked_col == place_col) or (
+                picked_row == place_row - 1 and picked_col == place_col):
+            return True
+        elif (picked_row == place_row and picked_col == place_col + 1) or (
+                picked_row == place_row and picked_col == place_col - 1):
+            return True
+        elif (picked_col == place_col + 1 or picked_col == place_col + -1) and (picked_row == place_row + 1 or picked_row == place_row + -1):
+            return True
+        else:
+            return False
+    else:
+        return False
 # Draws pieces on board based on board data
 def draw_pieces(board):
     for c in range(COL_COUNT):
