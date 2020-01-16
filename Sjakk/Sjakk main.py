@@ -85,7 +85,7 @@ def move_piece(board, col, row, pick_or_place, turn):
                 else:
                     board[row_store][col_store] = picked_piece_store
                     pick_or_place -= 1
-                    print("Validate failed")
+                    print("Move validation failed")
                     return pick_or_place, turn
             else:
                 board[row_store][col_store] = picked_piece_store
@@ -116,11 +116,15 @@ def move_piece(board, col, row, pick_or_place, turn):
                 else:
                     board[row_store][col_store] = picked_piece_store
                     pick_or_place -= 1
-                    print("Invalid black placement")
+                    print("Move validation failed")
                     return pick_or_place, turn
+            else:
+                board[row_store][col_store] = picked_piece_store
+                pick_or_place -= 1
+                print("Invalid black placement")
+                return pick_or_place, turn
 
 def validate_piece_placement(board,picked_piece, picked_row, picked_col, place_row, place_col):
-    print(picked_piece)
     # Validate pawn move
     if picked_piece == 1:
         if picked_row == place_row + 1 and picked_col == place_col:
@@ -142,7 +146,7 @@ def validate_piece_placement(board,picked_piece, picked_row, picked_col, place_r
             return False
 
     #Validate knight move
-    elif picked_piece == 3 or -3:
+    elif picked_piece == 3 or picked_piece == -3:
         if picked_row == place_row + 2 and (picked_col == place_col + 1 or picked_col == place_col - 1):
             return True
         elif picked_row == place_row + 1 and (picked_col == place_col + 2 or picked_col == place_col - 2):
@@ -155,8 +159,7 @@ def validate_piece_placement(board,picked_piece, picked_row, picked_col, place_r
             return False
 
     # Validate rook move
-    elif picked_piece == 2 or -2:
-        print("rook")
+    elif picked_piece == 2 or picked_piece == -2:
         if picked_col == place_col:
             for r in range(abs(picked_row - place_row)):
                 if picked_row > place_row:
@@ -175,9 +178,9 @@ def validate_piece_placement(board,picked_piece, picked_row, picked_col, place_r
                     if board[picked_row][picked_col + r] != 0:
                         return False
             return True
+
     # Validate bishop move
-    elif picked_piece == 4 or -4:
-        print("bishop1")
+    elif picked_piece == 4 or picked_piece == -4:
         if picked_col != place_col and picked_row != place_row and (abs(picked_row - place_row) - abs(picked_col - place_col)) == 0:
             check = (place_row + place_col) % 2
             print(check)
@@ -197,8 +200,9 @@ def validate_piece_placement(board,picked_piece, picked_row, picked_col, place_r
             return True
         else:
             return False
+
     # Validate queen move
-    elif picked_piece == 5 or -5:
+    elif picked_piece == 5 or picked_piece == -5:
         if picked_col == place_col:
             for r in range(abs(picked_row - place_row)):
                 if picked_row > place_row:
@@ -239,7 +243,7 @@ def validate_piece_placement(board,picked_piece, picked_row, picked_col, place_r
             return False
 
     # Validate king move
-    elif picked_piece == 6 or -6:
+    elif picked_piece == 6 or picked_piece == -6:
         if (picked_row == place_row + 1 and picked_col == place_col) or (
                 picked_row == place_row - 1 and picked_col == place_col):
             return True
@@ -252,6 +256,7 @@ def validate_piece_placement(board,picked_piece, picked_row, picked_col, place_r
             return False
     else:
         return False
+
 # Draws pieces on board based on board data
 def draw_pieces(board):
     for c in range(COL_COUNT):
