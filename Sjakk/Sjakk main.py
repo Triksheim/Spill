@@ -3,18 +3,11 @@ import pygame
 import sys
 import math
 
-
-LIGHTBROWN = (255, 204, 153)
-DARKBROWN = (80, 40, 5)
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
 ROW_COUNT = 8
 COL_COUNT = 8
 SQUARESIZE = 100
 
-
 # Functions ----------------------------------------------------------------------------------------------------------
-
 # Create matrix of zeroes for board data
 def create_board():
     board = numpy.zeros((ROW_COUNT, COL_COUNT))
@@ -26,25 +19,18 @@ def draw_board(board):
         for r in range(0, ROW_COUNT , 2):
             light_tile_rect = r * SQUARESIZE, c * SQUARESIZE
             screen.blit(light_tile,light_tile_rect)
-            #pygame.draw.rect(screen, LIGHTBROWN, (c*SQUARESIZE, r*SQUARESIZE, SQUARESIZE, SQUARESIZE))
     for c in range(1, COL_COUNT, 2):
         for r in range(1, ROW_COUNT, 2):
             light_tile_rect = r * SQUARESIZE, c * SQUARESIZE
             screen.blit(light_tile, light_tile_rect)
-            #pygame.draw.rect(screen, LIGHTBROWN, (c * SQUARESIZE, r * SQUARESIZE, SQUARESIZE, SQUARESIZE))
     for c in range(0, COL_COUNT, 2):
          for r in range(1, ROW_COUNT, 2):
             dark_tile_rect = r * SQUARESIZE, c * SQUARESIZE
             screen.blit(dark_tile, dark_tile_rect)
-            #pygame.draw.rect(screen, DARKBROWN, (c * SQUARESIZE, r * SQUARESIZE, SQUARESIZE, SQUARESIZE))
     for c in range(1, COL_COUNT, 2):
         for r in range(0, ROW_COUNT, 2):
             dark_tile_rect = r * SQUARESIZE, c * SQUARESIZE
             screen.blit(dark_tile, dark_tile_rect)
-            #pygame.draw.rect(screen, DARKBROWN, (c * SQUARESIZE, r * SQUARESIZE, SQUARESIZE, SQUARESIZE))
-
-            # rook_rect = r * SQUARESIZE, c * SQUARESIZE
-            # screen.blit(rook, rook_rect)
 
 # Place starting pieces. White is positive and black is negative values
 # 1 = pawn, 2 = rook, 3 = knight, 4 = bishop, 5 = queen, 6 = king
@@ -87,12 +73,21 @@ def move_piece(board, col, row, pick_or_place, turn):
             # Checks if picked place is a new position and no piece of same color on square
             if board[row][col] <= 0 and not (row == row_store and col == col_store):
                 if validate_piece_placement(board,picked_piece_store, row_store, col_store, row, col):
-                    board[row][col] = picked_piece_store    # Placing the piece in board data
-                    pick_or_place -= 1
-                    print(board)
-                    print("Placed white piece")
-                    turn += 1                               # Switches turn
-                    return pick_or_place, turn
+                    if picked_piece_store == 1 and row == 0:    # Promoting pawn
+                        board[row][col] = 5
+                        pick_or_place -= 1
+                        print(board)
+                        print("Placed white piece")
+                        print("White pawn promoted")
+                        turn += 1
+                        return pick_or_place, turn
+                    else:
+                        board[row][col] = picked_piece_store    # Placing the piece in board data
+                        pick_or_place -= 1
+                        print(board)
+                        print("Placed white piece")
+                        turn += 1                               # Switches turn
+                        return pick_or_place, turn
                 else:
                     board[row_store][col_store] = picked_piece_store
                     pick_or_place -= 1
@@ -118,12 +113,21 @@ def move_piece(board, col, row, pick_or_place, turn):
         else:
             if board[row][col] >= 0 and not (row == row_store and col == col_store):
                 if validate_piece_placement(board, picked_piece_store, row_store, col_store, row, col):
-                    board[row][col] = picked_piece_store
-                    pick_or_place -= 1
-                    print(board)
-                    print("Placed black piece")
-                    turn -= 1
-                    return pick_or_place, turn
+                    if picked_piece_store == -1 and row == 7:
+                        board[row][col] = -5
+                        pick_or_place -= 1
+                        print(board)
+                        print("Placed black piece")
+                        print("Black pawn promoted")
+                        turn -= 1
+                        return pick_or_place, turn
+                    else:
+                        board[row][col] = picked_piece_store
+                        pick_or_place -= 1
+                        print(board)
+                        print("Placed black piece")
+                        turn -= 1
+                        return pick_or_place, turn
                 else:
                     board[row_store][col_store] = picked_piece_store
                     pick_or_place -= 1
@@ -136,11 +140,12 @@ def move_piece(board, col, row, pick_or_place, turn):
                 return pick_or_place, turn
 
 def validate_piece_placement(board,picked_piece, picked_row, picked_col, place_row, place_col):
+
     # Validate pawn move
     if picked_piece == 1:
         if picked_row == place_row + 1 and picked_col == place_col and board[place_row][place_col] == 0:
             return True
-        elif picked_row == 6 and  picked_row == place_row + 2 and picked_col == place_col:
+        elif picked_row == 6 and picked_row == place_row + 2 and picked_col == place_col:
             return True
         elif picked_row == place_row + 1 and abs(picked_col - place_col) == 1 and board[place_row][place_col] < 0:
             return True
@@ -156,7 +161,7 @@ def validate_piece_placement(board,picked_piece, picked_row, picked_col, place_r
         else:
             return False
 
-    #Validate knight move
+    # Validate knight move
     elif picked_piece == 3 or picked_piece == -3:
         if picked_row == place_row + 2 and (picked_col == place_col + 1 or picked_col == place_col - 1):
             return True
@@ -234,8 +239,6 @@ def validate_piece_placement(board,picked_piece, picked_row, picked_col, place_r
                         return False
             return True
         elif picked_col != place_col and picked_row != place_row and (abs(picked_row - place_row) - abs(picked_col - place_col)) == 0:
-            check = (place_row + place_col) % 2
-            print(check)
             for r in range(abs(picked_row - place_row)):
                 if picked_row > place_row and picked_col > place_col:
                     if board[picked_row - r][picked_col - r] != 0:
@@ -315,7 +318,7 @@ def draw_pieces(board):
 # Drags a picked piece at mouse location until placed
 def drag_piece(picked_piece_store, turn, board):
     # White pieces
-    if picked_piece_store == 1 and turn == 0:
+    if picked_piece_store == 1 and turn == 0:           # Checks piece and color
         mouse_x, mouse_y = pygame.mouse.get_pos()       # Get current mouse position
         pawn_drag = int(mouse_x-50), int(mouse_y-50)
         draw_pieces(board)
@@ -387,22 +390,17 @@ def get_event_mouse_pos(event):
     col = int(math.floor(posx / SQUARESIZE))
     row = int(math.floor(posy / SQUARESIZE))
     return col, row
-#---------------------------------------------------------------------------------------------------------------------
+# ---------------------------------------------------------------------------------------------------------------------
 
-game_over = False
-turn = 0
-picked_piece = 0
-row_store = 0
-col_store = 0
-pick_or_place = 0
-
+# Setup ---
 pygame.init()
 pygame.display.set_caption("Sjakk")
 
+# Resize game window
 width = COL_COUNT * SQUARESIZE
 height = ROW_COUNT * SQUARESIZE
 size = width, height
-screen = pygame.display.set_mode(size)      # Resize game window
+screen = pygame.display.set_mode(size)
 
 # # Load and resize board image
 light_tile = pygame.image.load("light_wood.png")
@@ -438,7 +436,11 @@ queen_b = pygame.transform.scale(queen_b,(int(SQUARESIZE-11),int(SQUARESIZE-11))
 king_b = pygame.image.load("king_b.png")
 king_b = pygame.transform.scale(king_b,(int(SQUARESIZE),int(SQUARESIZE)))
 
-
+game_over = False
+turn = 0
+picked_piece = 0
+picked_piece_store = 0
+pick_or_place = 0
 board = create_board()
 place_starting_pieces(board)
 draw_board(board)
@@ -446,26 +448,26 @@ draw_pieces(board)
 print(board)
 print("Starting pieces placed")
 pygame.display.update()
-
+# Setup end ---
 
 # Main game loop
 while not game_over:
-    for event in pygame.event.get():                     # Checks for events and clears
+    for event in pygame.event.get():                                # Checks for events and clears
         if event.type == pygame.QUIT:
             sys.exit()
-        elif event.type == pygame.KEYDOWN:               # Quit when ESC pressed
+        elif event.type == pygame.KEYDOWN:                          # Quit when ESC pressed
             if event.key == pygame.K_ESCAPE:
                 pygame.quit()
-        elif event.type == pygame.MOUSEBUTTONDOWN:       # True when a mouse button is pressed
-            col, row = get_event_mouse_pos(event)        # Get mouse position at event trigger
-            if pick_or_place == 0:                       # 0 = Picking and 1 = already picked piece
+        elif event.type == pygame.MOUSEBUTTONDOWN:                  # True when a mouse button is pressed
+            col, row = get_event_mouse_pos(event)                   # Get mouse position at event trigger
+            if pick_or_place == 0:                                  # 0 = Picking and 1 = already picked piece
                 picked_piece_store, col_store, row_store,pick_or_place, turn \
-                = move_piece(board, col, row, pick_or_place, turn)
+                = move_piece(board, col, row, pick_or_place, turn)  # Moves piece in board data
             else:
                 pick_or_place, turn = move_piece(board, col, row, pick_or_place, turn)
         elif pick_or_place == 1:
-            drag_piece(picked_piece_store, turn, board)  # Drag picked piece at mouse position
+            drag_piece(picked_piece_store, turn, board)             # Drag picked piece at mouse position
         else:
-            draw_pieces(board)
-            pygame.display.update()                      # Updates game window
-            draw_board(board)
+            draw_pieces(board)                                      # Draws chess pieces based on board data
+            pygame.display.update()                                 # Updates game window
+            draw_board(board)                                       # Draws board
