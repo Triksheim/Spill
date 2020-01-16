@@ -24,16 +24,27 @@ def create_board():
 def draw_board(board):
     for c in range(0, COL_COUNT, 2):
         for r in range(0, ROW_COUNT , 2):
-            pygame.draw.rect(screen, LIGHTBROWN, (c*SQUARESIZE, r*SQUARESIZE, SQUARESIZE, SQUARESIZE))
+            light_tile_rect = r * SQUARESIZE, c * SQUARESIZE
+            screen.blit(light_tile,light_tile_rect)
+            #pygame.draw.rect(screen, LIGHTBROWN, (c*SQUARESIZE, r*SQUARESIZE, SQUARESIZE, SQUARESIZE))
     for c in range(1, COL_COUNT, 2):
         for r in range(1, ROW_COUNT, 2):
-            pygame.draw.rect(screen, LIGHTBROWN, (c * SQUARESIZE, r * SQUARESIZE, SQUARESIZE, SQUARESIZE))
+            light_tile_rect = r * SQUARESIZE, c * SQUARESIZE
+            screen.blit(light_tile, light_tile_rect)
+            #pygame.draw.rect(screen, LIGHTBROWN, (c * SQUARESIZE, r * SQUARESIZE, SQUARESIZE, SQUARESIZE))
     for c in range(0, COL_COUNT, 2):
          for r in range(1, ROW_COUNT, 2):
-            pygame.draw.rect(screen, DARKBROWN, (c * SQUARESIZE, r * SQUARESIZE, SQUARESIZE, SQUARESIZE))
+            dark_tile_rect = r * SQUARESIZE, c * SQUARESIZE
+            screen.blit(dark_tile, dark_tile_rect)
+            #pygame.draw.rect(screen, DARKBROWN, (c * SQUARESIZE, r * SQUARESIZE, SQUARESIZE, SQUARESIZE))
     for c in range(1, COL_COUNT, 2):
         for r in range(0, ROW_COUNT, 2):
-            pygame.draw.rect(screen, DARKBROWN, (c * SQUARESIZE, r * SQUARESIZE, SQUARESIZE, SQUARESIZE))
+            dark_tile_rect = r * SQUARESIZE, c * SQUARESIZE
+            screen.blit(dark_tile, dark_tile_rect)
+            #pygame.draw.rect(screen, DARKBROWN, (c * SQUARESIZE, r * SQUARESIZE, SQUARESIZE, SQUARESIZE))
+
+            # rook_rect = r * SQUARESIZE, c * SQUARESIZE
+            # screen.blit(rook, rook_rect)
 
 # Place starting pieces. White is positive and black is negative values
 # 1 = pawn, 2 = rook, 3 = knight, 4 = bishop, 5 = queen, 6 = king
@@ -127,20 +138,20 @@ def move_piece(board, col, row, pick_or_place, turn):
 def validate_piece_placement(board,picked_piece, picked_row, picked_col, place_row, place_col):
     # Validate pawn move
     if picked_piece == 1:
-        if picked_row == place_row + 1 and picked_col == place_col:
+        if picked_row == place_row + 1 and picked_col == place_col and board[place_row][place_col] == 0:
             return True
         elif picked_row == 6 and  picked_row == place_row + 2 and picked_col == place_col:
             return True
-        elif picked_row == place_row + 1 and board[place_row][place_col] < 0:
+        elif picked_row == place_row + 1 and abs(picked_col - place_col) == 1 and board[place_row][place_col] < 0:
             return True
         else:
             return False
     elif picked_piece == -1:
-        if picked_row == place_row - 1 and picked_col == place_col:
+        if picked_row == place_row - 1 and picked_col == place_col and board[place_row][place_col] == 0:
             return True
         elif picked_row == 1 and picked_row == place_row - 2 and picked_col == place_col:
             return True
-        elif picked_row == place_row - 1 and board[place_row][place_col] > 0:
+        elif picked_row == place_row - 1 and abs(picked_col - place_col) == 1 and board[place_row][place_col] > 0:
             return True
         else:
             return False
@@ -392,6 +403,12 @@ width = COL_COUNT * SQUARESIZE
 height = ROW_COUNT * SQUARESIZE
 size = width, height
 screen = pygame.display.set_mode(size)      # Resize game window
+
+# # Load and resize board image
+light_tile = pygame.image.load("light_wood.png")
+light_tile = pygame.transform.scale(light_tile,(int(SQUARESIZE),int(SQUARESIZE)))
+dark_tile = pygame.image.load("dark_wood.png")
+dark_tile = pygame.transform.scale(dark_tile,(int(SQUARESIZE),int(SQUARESIZE)))
 
 # Load and resize image of white pieces
 pawn = pygame.image.load("pawn.png")
